@@ -23,6 +23,6 @@ public interface KHTUserRepository extends JpaRepository<KHTUser, Long> {
     // 유저 네임을 이용해서 비밀번호 찾기
     KHTUser findByUsername(String username);
 
-
+    // 이용해서 상세보기
     KHTUser findById(int id);
 }

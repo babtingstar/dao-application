@@ -1,13 +1,132 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>$Title$</title>
-  <link rel="icon" href="/favicon.ico">
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>제품조회</title>
+    <style>
+        body {
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #eee;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-$END$
+<h1>제품조회</h1>
+<ul id="productList"></ul>
+<script>
+
+    function getProductList() {
+        let productList = $('#productList');
+        $.ajax({
+            url: '/api/products',
+            method: 'GET',
+            success: function (data) {
+                productList.empty();
+                $.each(data, function (index, product) {
+                    productList.append(
+                        '<li>' + product.name + '</li>'
+                    )
+                })
+            },
+            error: function () {
+                productList.html('<p>컨트롤러에서 데이터를 가져오는데 문제가 생겼습니다</p>');
+            }
+        })
+    }
+
+    getProductList();
+</script>
+
+<h1>제품 등록</h1>
+<form id="productForm">
+    <label for="name">제품명칭 : </label>
+    <input id="name" name="name" type="text">
+    <label for="price">제품가격</label>
+    <input id="price" name="price" type="number">
+    <label for="description">제품 설명 : </label>
+    <textarea cols="30" id="description" name="description" rows="10"></textarea>
+    <label for="stock">수량 : </label>
+    <input id="stock" name="stock" type="number">
+    <button id="saveProductButton" type="button">제품저장</button>
+</form>
+
+<script>
+    $('#saveProductButton').click(function () {
+        let name = $('#name').val();
+        let price = $('#price').val();
+        let description = $('#description').val();
+        let stock = $('#stock').val();
+        $.ajax({
+            url: '/api/saveProduct',
+            method: 'POST',
+            contentType: "application/json", //자바 추천형식으로 사용 OK 'application/x-www-form-urlencoded;charset=UTF-8'
+            data:
+            // 배열형태로 한  컬럼에 여러 값을 저장 {JSON: JSON.stringify(JSON.parse(JSON.stringify(productList)))},}
+            // 배열형태로 여러컬럼에 한 번에 저장
+                JSON.stringify({ name: name,
+                    price: price,
+                    description: description,
+                    stock: stock
+                })
+            ,
+            success: function (data) {
+                alert("제품이 무사히 등록되었습니다.");
+
+                // ajax 기능을 한 번더 이용해서 제품 불러오기
+                getProductList(); //제품 등록 되었을 때 제품 모두 보기 기능 사용
+                $("#name").val('');
+                $("#price").val('');
+                $("#description").val('');
+                $("#stock").val('');
+            },
+            error: function () {
+                alert("제품 등록에 실패하였습니다.");
+            }
+        })
+    })
+</script>
 </body>
 </html>

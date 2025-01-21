@@ -20,4 +20,8 @@ public class KHTProductService {
     public KHTProduct save(KHTProduct khtProduct){
         return khtProductRepository.save(khtProduct);
     }
+
+    public KHTProduct findById(int id){
+        return khtProductRepository.findById(id);
+    }
 }
