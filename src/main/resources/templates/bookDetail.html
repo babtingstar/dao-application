@@ -25,6 +25,7 @@
                 if(data) { // 데이터가 있음!  DB에서 데이터가 1개 이상인 상태
                     $("#bookDetail").html(`
                                             <h1>${data.id}</h1>
+                                            <img src="${data.imagePath}">
                                             <p>${data.title}</p>
                                             <p>${data.author}</p>
                                             <p>${data.genre}</p>

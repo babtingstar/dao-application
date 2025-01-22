@@ -1,15 +1,15 @@
 package edu.kh.com.daoapplication.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @Getter
 @Setter
-@Entity
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class KHTProduct {
 
     @Id

@@ -27,4 +27,7 @@ public interface KHTUserRepository extends JpaRepository<KHTUser, Long> {
 
     // 이용해서 상세보기
     KHTUser findById(int id);
+
+    // 이미지 저장하기
+
 }
