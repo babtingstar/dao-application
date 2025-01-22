@@ -1,14 +1,15 @@
 package edu.kh.com.daoapplication.controller;
 
-import edu.kh.com.daoapplication.entity.KHTBook;
-import edu.kh.com.daoapplication.entity.KHTProduct;
-import edu.kh.com.daoapplication.entity.KHTUser;
+import edu.kh.com.daoapplication.model.entity.KHTBook;
+import edu.kh.com.daoapplication.model.entity.KHTProduct;
+import edu.kh.com.daoapplication.model.entity.KHTUser;
+import edu.kh.com.daoapplication.model.vo.VerificationRequest;
 import edu.kh.com.daoapplication.service.KHTBookService;
 import edu.kh.com.daoapplication.service.KHTProductService;
 import edu.kh.com.daoapplication.service.KHTUserService;
+import edu.kh.com.daoapplication.service.VerificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,30 +47,29 @@ public class ApiController {
         log.info(products.toString());
         return products;
 
-    //    return khtProductService.findAll();
+        //    return khtProductService.findAll();
     }
 
     // 제품 등록 /api/saveProduct
     @PostMapping("/saveProduct") //    /api/saveProduct
     public KHTProduct saveProduct(@RequestBody KHTProduct khtProduct) {
-        KHTProduct  savedProduct = khtProductService.save(khtProduct);
+        KHTProduct savedProduct = khtProductService.save(khtProduct);
         log.info(savedProduct.toString());
         return savedProduct;
-       // return khtProductService.save(khtProduct);
+        // return khtProductService.save(khtProduct);
     }
 
     /**
-     *
+     * @param id 는    get('id' 로 가져온 값을 활용해서 ajax로 db에서 id값에 해당하는 데이터를 가져오기
+     * @return
      * @RequestParam 으로 전달받은 값을
      * URLSearchParams = URL 주소에서 parameters(파라미터들)을 search 검색해서
      * urlParams 라는 변수 이름에 ? 뒤에 오는 키=값 을 모두 담아둠
      * urlParams에서 원하는 키의 값을 get 해서 가져옴
      * id라는 변수 이름에 키에 해당하는 값을 저장
-     *
+     * <p>
      * const urlParams = new URLSearchParams(window.location.search);
      * const id = urlParams.get('id');
-     * @param id  는    get('id' 로 가져온 값을 활용해서 ajax로 db에서 id값에 해당하는 데이터를 가져오기
-     * @return
      */
     @GetMapping("/user/{id}")
     public KHTUser findById(@PathVariable("id") int id) {
@@ -84,6 +84,7 @@ public class ApiController {
         log.info(khtProduct.toString());
         return khtProduct;
     }
+
     @GetMapping("/books")
     public List<KHTBook> books() {
         return khtBookService.findAll();
@@ -110,16 +111,48 @@ public class ApiController {
     @PostMapping("/bookSaveImg")
     public KHTBook saveBookImg(@RequestParam("title") String title,
                                @RequestParam("author") String author,
-                                @RequestParam("genre") String genre,
+                               @RequestParam("genre") String genre,
                                @RequestParam("file") MultipartFile file) {
-        return khtBookService.save(title, author,genre,file);
+        return khtBookService.save(title, author, genre, file);
     }
 
     @PostMapping("/saveUserImage")
     public KHTUser saveUserImg(@RequestParam("username") String username,
                                @RequestParam("password") String password,
-                               @RequestParam("file") MultipartFile file)
-    {
+                               @RequestParam("file") MultipartFile file) {
         return khtUserService.save(username, password, file);
+    }
+
+    /********************** 이메일 인증 *******************************/
+    @Autowired
+    private VerificationService verificationService;
+
+    @PostMapping("/sendCode")
+    public String sendCode(@RequestBody VerificationRequest vr) {
+        System.out.println("=== Request Controller /api/sendCode ===");
+        String email = vr.getEmail();
+        System.out.println("controller email : " + email);
+
+        String code = verificationService.randomCode();
+        System.out.println("controller code : " + code);
+
+        verificationService.saveEmailCode(email, code);
+        System.out.println("controller - Save method : " + email + "->" + code);
+
+        verificationService.sendEmail(email, code);
+        System.out.println("controller - 이메일을 성공적으로 보냄 :  " + code);
+        return "이메일을 성공적으로 보냈습니다." + email;
+    }
+
+    // 인증번호 일치하는 지 확인
+    @PostMapping("/checkCode")
+    public String checkCode(@RequestBody VerificationRequest vr) {
+        boolean isValid = verificationService.verifyCodeWithVO(vr);
+        System.out.println("Controller - checkCode method isValid : " + isValid);
+        if (isValid) {
+            return "인증번호가 일치합니다.";
+        } else {
+            return "인증번호가 일치하지 않습니다.";
+        }
     }
 }

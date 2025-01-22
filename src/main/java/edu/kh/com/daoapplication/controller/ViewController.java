@@ -52,4 +52,9 @@ public class ViewController {
     public String saveBook() {
         return "newBooks";
     }
+
+    @GetMapping("/inputEmail")
+    public String inputEmail() {
+        return "inputEmail";
+    }
 }

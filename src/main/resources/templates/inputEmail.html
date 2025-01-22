@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>이메일 인증하기</title>
+    <link rel="icon" href="/favicon.ico">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<h1>이메일 인증하기</h1>
+<input type="text" name="email" id="emailInput" placeholder="인증할 이메일 입력">
+<button id="sendCodeBtn">인증번호 보내기</button>
+<script>
+    // 이메일로 인증번호 보내기 버튼을 클릭하면
+</script>
+<input id="codeInput" placeholder="인증번호 입력" type="text">
+<button id="checkCodeBtn">인증번호 확인</button>
+<script>
+    let isVerified = false;
+    $('#emailInput').on('input', function () {
+        $('#sendCodeBtn').prop('enable', 'true');
+        $('#checkCodeBtn').prop('disabled', 'true');
+        isVerified = false;
+    })
+    $('#sendCodeBtn').prop('disabled', false).click(function () {
+
+        // $("#emailImput").val();
+        let email = $('#emailInput').val().toLowerCase();
+        // 만약에 이메일 입력안함
+        if(!email){
+            alert("이메일을 입력해주세요.");
+            return;
+        }
+        $.ajax({
+            url:"/api/sendCode",
+            method:"POST",
+            contentType: "application/json", // 415
+            data:JSON.stringify({email:email}),
+            success:function (data) {
+                alert(data);
+                $('#sendCodeBtn').prop('disabled', true);
+                $('#checkCodeBtn').prop('disabled', false);
+                $('#emailInput').prop('disabled', true);
+            },
+            error:function (error) {
+                alert(error);
+            }
+        })
+
+    })
+    $('#checkCodeBtn').prop('disabled', true).click(function () {
+        let email = $('#emailInput').val().toLowerCase();
+        let code = $('#codeInput').val();
+        console.log("email: " + email);
+        console.log("code:" + code);
+
+        $.ajax({
+            url:"/api/checkCode",
+            method:"POST",
+            contentType: "application/json",
+            data:JSON.stringify({email:email,code:code}),
+            success:function (data) {
+                alert(data);
+                $('#sendCodeBtn').prop('disabled', false);
+                $('#checkCodeBtn').prop('disabled', true);
+                $('#emailInput').prop('disabled', false);
+                isVerified = true;
+            },
+            error:function (error) {
+                alert(error);
+            }
+        })
+    })
+</script>
+</body>
+</html>
