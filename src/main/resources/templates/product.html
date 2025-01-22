@@ -58,26 +58,26 @@
 <ul id="productList"></ul>
 <script>
 
-    function getProductList() {
-        let productList = $('#productList');
-        $.ajax({
-            url: '/api/products',
-            method: 'GET',
-            success: function (data) {
-                productList.empty();
-                $.each(data, function (index, product) {
-                    productList.append(
-                        '<li>' + product.name + '</li>'
-                    )
-                })
-            },
-            error: function () {
-                productList.html('<p>컨트롤러에서 데이터를 가져오는데 문제가 생겼습니다</p>');
-            }
-        })
-    }
+function getProductList() {
+    let productList = $('#productList');
+    $.ajax({
+        url: '/api/products',
+        method: 'GET',
+        success: function (data) {
+            productList.empty();
+            $.each(data, function (index, product) {
+                productList.append(
+                    `<li><a href="/products/detail?id=${productId}">  ${product.name} </a></li>`
+                )
+            })
+        },
+        error: function () {
+            productList.html('<p>컨트롤러에서 데이터를 가져오는데 문제가 생겼습니다</p>');
+        }
+    })
+}
 
-    getProductList();
+getProductList();
 </script>
 
 <h1>제품 등록</h1>
@@ -90,27 +90,36 @@
     <textarea cols="30" id="description" name="description" rows="10"></textarea>
     <label for="stock">수량 : </label>
     <input id="stock" name="stock" type="number">
-    <button id="saveProductButton" type="button">제품저장</button>
+    <button id="saveProductButton" type="button">제품저장</button> <!-- type="submit"-->
 </form>
 
 <script>
-    $('#saveProductButton').click(function () {
+    $('#saveProductButton').click(function (e) {
+        e.preventDefault();
+        // 정규식에 일치하게 작성했는지
+        // 빈칸인지 빈칸이 아닌지
+        // 동일한 아이디가 존재하는지
         let name = $('#name').val();
         let price = $('#price').val();
         let description = $('#description').val();
         let stock = $('#stock').val();
+
+        if (!name || !price || !description || !stock) {
+            alert("모든 필드를 입력해주세요.");
+            return; //작성안하면 제출 못하게 방지
+        }
         $.ajax({
             url: '/api/saveProduct',
             method: 'POST',
             contentType: "application/json", //자바 추천형식으로 사용 OK 'application/x-www-form-urlencoded;charset=UTF-8'
             data:
-            // 배열형태로 한  컬럼에 여러 값을 저장 {JSON: JSON.stringify(JSON.parse(JSON.stringify(productList)))},}
-            // 배열형태로 여러컬럼에 한 번에 저장
+               // 배열형태로 한  컬럼에 여러 값을 저장 {JSON: JSON.stringify(JSON.parse(JSON.stringify(productList)))},}
+               // 배열형태로 여러컬럼에 한 번에 저장
                 JSON.stringify({ name: name,
-                    price: price,
-                    description: description,
-                    stock: stock
-                })
+                        price: price,
+                        description: description,
+                        stock: stock
+                    })
             ,
             success: function (data) {
                 alert("제품이 무사히 등록되었습니다.");

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>책 등록하기</title>
+    <link href="/favicon.ico" rel="icon">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<!--
+1. form 태그를 이용해서 form 태그 내에 작성한 id 값으로
+submit 해서 데이터 저장
+
+2. form 태그 내 button type 을 button 형식으로 변경하고
+   click 해서 데이터 저장
+
+3. div 태그 내 button type 을 button 형식으로 변경하고
+    click 해서 데이터 저장
+ -->
+<h1>📝 책 등록하기</h1>
+<div id="book">
+    <label for="title">책 제목 : </label>
+    <input id="title" placeholder="책 제목 입력" required type="text">
+
+    <label for="author">저자</label>
+    <input id="author" placeholder="책 저자 입력" required type="text">
+
+    <label for="genre">장르</label>
+    <input id="genre" placeholder="책 장르 입력" required type="text">
+    <button id="saveBook" type="button">저장하기</button>
+</div>
+<script>
+    $("#saveBook").click(function () {
+        let title = $("#title").val(); // input 내 들어있는 value 값 가져오기
+        let author = $("#author").val();
+        let genre = $("#genre").val();
+        $.ajax({
+            url: "/api/bookSave",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                title: title,
+                author: author,
+                genre: genre
+            }),
+            success: function () {
+                alert("책이 성공적으로 저장되었습니다.");
+                // window = 화면 창  location = 지역 href = 주소
+                // 해당하는 주소 지역으로 화면을 이동한다.
+                window.location.href = "/books"; //ViewControll er에서 책목록 확인하는 api = url 주소
+                // 만약에 창 이동을 하지 않을 경우 기존에 작성한
+                // title, author, genre 에 .val('') 을 넣어 값 비우기 설정
+            },
+            error: function () {
+                alert("데이터 등록에 실패했습니다.");
+            }
+        })
+    });
+</script>
+
+</body>
+</html>

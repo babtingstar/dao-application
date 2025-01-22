@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>책 목록 조회</title>
+    <link href="/favicon.ico" rel="icon">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<h1>책 목록 조회</h1>
+<table class="books-table">
+    <thead>
+    <tr> <!-- id 값을 tr 위 설정 append-->
+        <th>ID</th>
+        <th>제목</th>
+        <th>저자</th>
+        <th>장르</th>
+        <th>이동하기</th>
+    </tr>
+    </thead>
+    <tbody id="books">
+
+    </tbody>
+
+
+</table>
+<script>
+    $.ajax({
+        url: "/api/books",
+        method: "GET", // type(old version) method(new version)
+        success:
+            function (data) {
+                $.each(data, function (index, value) {
+                    $("#books").append(
+                        `
+                           <tr>
+                              <th>${value.id}</th>
+                              <th>${value.title}</th>
+                              <th>${value.author}</th>
+                              <th>${value.genre}</th>
+                              <th><a href="/book?id=${value.id}">이동</a></th>
+                          </tr>
+                          `
+                    )
+                })
+            }
+    })
+
+</script>
+</body>
+</html>
